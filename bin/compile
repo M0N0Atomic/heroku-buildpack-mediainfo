@@ -1,33 +1,31 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
-echo "-----> Install mediainfo (v20.9)."
+set -eo pipefail
 
 BUILD_DIR=$1
-BASE_DIR="$PWD"
-VENDOR_DIR="vendor"
-PACKAGE_NAME="mediainfo"
-PROFILE_PATH="${BUILD_DIR}/.profile.d/${PACKAGE_NAME}.sh"
-url=(libmms libzen libmediainfo mediainfo)
-declare -A urls=(
-	[libmms]="https://github.com/iTzBlack007/Archives/raw/main/libmms0_0.6.4-3_amd64.deb"
-	[libzen]="https://mediaarea.net/download/binary/libzen0/0.4.38/libzen0v5_0.4.38-1_amd64.xUbuntu_20.04.deb"
-	[libmediainfo]="https://mediaarea.net/download/binary/libmediainfo0/20.09/libmediainfo0v5_20.09-1_amd64.xUbuntu_20.04.deb"
-	[mediainfo]="https://mediaarea.net/download/binary/mediainfo/20.09/mediainfo_20.09-1_amd64.xUbuntu_20.04.deb"
-)
+MEDIAINFO_VER="20.09"
 
-mkdir -p "${BUILD_DIR}/${VENDOR_DIR}/${PACKAGE_NAME}" && cd "$_" || exit 1
-DOWNLOAD_DIR="$PWD"
-for i in "${url[@]}"; do
-	echo "-----> Downloading : ${urls[$i]}"
-	curl -s -L --url "${urls[$i]}" --output "$i".deb
-	dpkg -x "$i".deb .
-	rm "$i".deb
-done
+disp() {
+  echo "-----> $*"
+}
 
-cd "$BASE_DIR" || exit 1
-mkdir -p $(dirname $PROFILE_PATH)
+indent() {
+  sed -u 's/^/       /'
+}
 
-echo 'export PATH="$PATH:${DOWNLOAD_DIR}/usr/bin:${HOME}/vendor/mediainfo/usr/bin"'
-echo 'export LD_LIBRARY_PATH="${LD_LIBRARY_PATH}:${DOWNLOAD_DIR}/usr/lib/x86_64-linux-gnu:${HOME}/vendor/mediainfo/usr/lib/x86_64-linux-gnu"'
+disp "Unpacking mediainfo"
+cd $BUILD_DIR
+curl -fsSL "https://github.com/code-rgb/files/raw/main/mediainfo_${MEDIAINFO_VER}.tar.gz" | tar xzf - | indent
 
-echo "-----> Successfully installed mediainfo (v20.9)."
+disp "Creating PROFILE_PATH"
+PROFILE_PATH="$BUILD_DIR/.profile.d"
+mkdir -p $PROFILE_PATH
+
+disp "Exporting PATH"
+cat <<EOF >${PROFILE_PATH}/mediainfo.sh
+export PATH="\$HOME/vendor/mediainfo/bin:\$PATH"
+export LD_LIBRARY_PATH="\$HOME/vendor/mediainfo/lib/x86_64-linux-gnu:\$HOME/vendor/mediainfo/lib/i386-linux-gnu:\$HOME/vendor/mediainfo/lib:\$LD_LIBRARY_PATH"
+export LIBRARY_PATH="\$HOME/vendor/mediainfo/lib/x86_64-linux-gnu:\$HOME/vendor/mediainfo/lib/i386-linux-gnu:\$HOME/vendor/mediainfo/lib:\$LIBRARY_PATH"
+EOF
+
+disp "Mediainfo v${MEDIAINFO_VER} installed successfully."
