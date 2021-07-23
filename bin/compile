@@ -27,9 +27,7 @@ done
 cd "$BASE_DIR" || exit 1
 mkdir -p $(dirname $PROFILE_PATH)
 
-cat <<EOF >"$PROFILE_PATH"
-export PATH=$PATH:${HOME}/vendor/mediainfo/usr/bin
-export LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:${HOME}/vendor/mediainfo/usr/lib/x86_64-linux-gnu
-EOF
+echo 'export PATH="$PATH:${DOWNLOAD_DIR}/usr/bin:${HOME}/vendor/mediainfo/usr/bin"'
+echo 'export LD_LIBRARY_PATH="${LD_LIBRARY_PATH}:${DOWNLOAD_DIR}/usr/lib/x86_64-linux-gnu:${HOME}/vendor/mediainfo/usr/lib/x86_64-linux-gnu"'
 
 echo "-----> Successfully installed mediainfo (v20.9)."
