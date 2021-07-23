@@ -25,7 +25,7 @@ for i in "${url[@]}"; do
 done
 
 cd "$BASE_DIR" || exit 1
-mkdir "${BUILD_DIR}/.profile.d"
+mkdir -p "${BUILD_DIR}/.profile.d"
 
 echo "-----> Writing profile script."
 cat <<EOF >"$PROFILE_PATH"
